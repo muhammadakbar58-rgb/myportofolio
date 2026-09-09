@@ -3,111 +3,259 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Akbar - Portfolio</title>
+
+    <title>{{ name }} - Portfolio</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
+
 <body>
+
     <header class="site-header">
         <div class="container">
-            <a href="#profile" class="brand">Akbar</a>
+
+            <a href="{% url 'main:show_main' %}" class="brand">{{ name }}</a>
+
             <nav>
-                <a href="#profile">Profile</a>
-                <a href="#education">Education</a>
+                <a href="{% url 'main:show_main' %}">Profile</a>
+                <a href="{% url 'main:show_experience' %}">Experience</a>
             </nav>
+
         </div>
     </header>
 
+
     <main>
+
         <section class="hero" id="profile">
+
             <div class="container hero-grid">
+
                 <div class="hero-identity">
-                    <p class="hero-kicker">Computer Science &middot; Universitas Indonesia</p>
-                    <h1>Muhammad Akbar Rinaldy</h1>
+
+                    <p class="hero-kicker">
+                        {{ study_program }} &middot; Universitas Indonesia
+                    </p>
+
+                    <h1>{{ name }}</h1>
+
                 </div>
+
+
                 <div class="hero-photo">
+
                     <div class="photo-block"></div>
-                    <img class="avatar" src="/static/img/profilepic.png" alt="Photo of Akbar">
+
+                    <img
+                        class="avatar"
+                        src="/static/img/profilepic.png"
+                        alt="Photo of {{ name }}"
+                    >
+
                 </div>
+
+
                 <div class="hero-details">
-                    <p class="bio">CS student at Universitas Indonesia. Discovering and trying new things.</p>
+
+                    <p class="bio">
+                        {{ bio }}
+                    </p>
+
+
                     <dl class="meta-list">
+
                         <div class="meta-row">
                             <dt>NPM</dt>
-                            <dd>2506586311</dd>
+                            <dd>{{ npm }}</dd>
                         </div>
+
                         <div class="meta-row">
                             <dt>Program</dt>
-                            <dd>S1 Ilmu Komputer</dd>
+                            <dd>{{ study_program }}</dd>
                         </div>
+
                     </dl>
+
+
                     <div class="social-links">
-                        <a href="https://github.com/muhammadakbar58-rgb" class="social-link">GitHub</a>
-                        <a href="https://www.linkedin.com/in/akbar-rinaldy-86b67731b/?skipRedirect=true" class="social-link">LinkedIn</a>
-                        <a href="mailto:kadshomi@gmail.com" class="social-link">Email</a>
-                        <a href="#education" class="social-link">Education &darr;</a>
+
+                        <a
+                            href="https://github.com/muhammadakbar58-rgb"
+                            class="social-link"
+                        >
+                            GitHub
+                        </a>
+
+                        <a
+                            href="https://www.linkedin.com/in/akbar-rinaldy-86b67731b/?skipRedirect=true"
+                            class="social-link"
+                        >
+                            LinkedIn
+                        </a>
+
+                        <a
+                            href="mailto:kadshomi@gmail.com"
+                            class="social-link"
+                        >
+                            Email
+                        </a>
+
+                        <a href="#education" class="social-link">
+                            Education &darr;
+                        </a>
+
                     </div>
+
                 </div>
+
             </div>
+
         </section>
 
-       <section class="education-section" id="education">
-    <div class="container">
-        <h2 class="section-title">Education</h2>
-        <div class="education-list">
-            <div class="education-card">
-                <div class="education-header">
-                    <div>
-                        <h3 class="degree">S1 Ilmu Komputer</h3>
-                        <p class="institution">Universitas Indonesia</p>
+
+        <section class="education-section" id="education">
+
+            <div class="container">
+
+                <h2 class="section-title">Education</h2>
+
+                <div class="education-list">
+
+                    <div class="education-card">
+
+                        <div class="education-header">
+
+                            <div>
+                                <h3 class="degree">
+                                    S1 Ilmu Komputer
+                                </h3>
+
+                                <p class="institution">
+                                    Universitas Indonesia
+                                </p>
+                            </div>
+
+                            <span class="year">
+                                2025 &ndash; Present
+                            </span>
+
+                        </div>
+
+                        <p class="description">
+                            Developing a strong foundation in computer science,
+                            with interests in software development, algorithms,
+                            and new technologies.
+                        </p>
+
                     </div>
-                    <span class="year">2025 &ndash; Present</span>
+
+
+                    <div class="education-card">
+
+                        <div class="education-header">
+
+                            <div>
+                                <h3 class="degree">
+                                    Senior High School
+                                </h3>
+
+                                <p class="institution">
+                                    SMA Al Kautsar
+                                </p>
+                            </div>
+
+                            <span class="year">
+                                2022 &ndash; 2025
+                            </span>
+
+                        </div>
+
+                        <p class="description">
+                            Built a strong academic foundation with an emphasis
+                            on mathematics, science, and analytical thinking.
+                        </p>
+
+                    </div>
+
+
+                    <div class="education-card">
+
+                        <div class="education-header">
+
+                            <div>
+                                <h3 class="degree">
+                                    Junior High School
+                                </h3>
+
+                                <p class="institution">
+                                    SMP Darma Bangsa
+                                </p>
+                            </div>
+
+                            <span class="year">
+                                2019 &ndash; 2022
+                            </span>
+
+                        </div>
+
+                        <p class="description">
+                            Built fundamental academic skills and developed an
+                            early interest in logical and analytical thinking.
+                        </p>
+
+                    </div>
+
+
+                    <div class="education-card">
+
+                        <div class="education-header">
+
+                            <div>
+                                <h3 class="degree">
+                                    Elementary School
+                                </h3>
+
+                                <p class="institution">
+                                    SD Darma Bangsa
+                                </p>
+                            </div>
+
+                            <span class="year">
+                                2013 &ndash; 2019
+                            </span>
+
+                        </div>
+
+                        <p class="description">
+                            Developed foundational academic skills and a curiosity
+                            for learning.
+                        </p>
+
+                    </div>
+
                 </div>
-                <p class="description">
-                    Developing a strong foundation in computer science, with interests in software development, algorithms, and new technologies.
-                </p>
+
             </div>
 
-            <div class="education-card">
-                <div class="education-header">
-                    <div>
-                        <h3 class="degree">Senior High School</h3>
-                        <p class="institution">SMA Al Kautsar</p>
-                    </div>
-                    <span class="year">2022 &ndash; 2025</span>
-                </div>
-                <p class="description">
-                    Built a strong academic foundation with an emphasis on mathematics, science, and analytical thinking.
-                </p>
-            </div>
+        </section>
 
-            <div class="education-card">
-                <div class="education-header">
-                    <div>
-                        <h3 class="degree">Junior High School</h3>
-                        <p class="institution">SMP Darma Bangsa</p>
-                    </div>
-                    <span class="year">2019 &ndash; 2022</span>
-                </div>
-                <p class="description">
-                    Built fundamental academic skills and developed an early interest in logical and analytical thinking.
-                </p>
-            </div>
+    </main>
 
-            <div class="education-card">
-                <div class="education-header">
-                    <div>
-                        <h3 class="degree">Elementary School</h3>
-                        <p class="institution">SD Darma Bangsa</p>
-                    </div>
-                    <span class="year">2013 &ndash; 2019</span>
-                </div>
-                <p class="description">
-                    Developed foundational academic skills and a curiosity for learning.
-                </p>
-            </div>
+
+    <footer>
+        <div class="container">
+
+            <p>
+                &copy; 2026 {{ name }}.
+                Fakultas Ilmu Komputer, Universitas Indonesia.
+            </p>
+
         </div>
-    </div>
-</section>
+    </footer>
+
+</body>
+</html>
