@@ -19,7 +19,7 @@ DEBUG = not PRODUCTION
 
 # Pengaturan Host & CSRF untuk PWS CS UI & Localhost
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "muhammad-akbar58-myportofolio.pws.cs.ui.ac.id"]
-CSRF_TRUSTED_ORIGINS = ["https://muhammad-akbar58-myportofolio.pws.cs.ui.ac.id"]
+CSRF_TRUSTED_ORIGINS = ["https://muhammad-akbar58-myportofolio.pwcs.cs.ui.ac.id"]
 
 
 # Application definition
