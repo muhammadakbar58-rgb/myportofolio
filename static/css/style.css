@@ -308,13 +308,36 @@ html {
     font-size: 1.25rem;
 }
 
-.experience-description,
+.experience-description {
+    color: #000;
+}
+
 .empty-state {
     color: var(--text-muted);
 }
 
 .experience-status {
     margin-top: 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.skill-image {
+    display: block;
+    object-fit: contain;
+}
+
+.experience-image {
+    display: block;
+    max-width: 100%;
+    object-fit: contain;
+    margin-bottom: 0.75rem;
+    border-radius: var(--radius);
+}
+
+.experience-year {
+    margin-bottom: 0.75rem;
+    color: var(--accent-dark);
     font-size: 0.85rem;
     font-weight: 600;
 }

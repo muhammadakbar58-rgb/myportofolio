@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{{ name }} - Portfolio</title>
+    <title>{{ name }} - Skills</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -33,28 +33,21 @@
 
 
     <main>
-        <section class="experience-section" id="experience">
+        <section class="experience-section" id="skills">
             <div class="container">
-                <p class="section-kicker">Perjalanan saya sejauh ini</p>
-                <h1>Experience</h1>
+                <p class="section-kicker">Kemampuan yang saya kembangkan</p>
+                <h1>Skills</h1>
 
                 <div class="experience-grid">
-                    {% for experience in experience_list %}
+                    {% for skill in skill_list %}
                     <article class="experience-card">
-                        {% if experience.image %}
-                        <img class="experience-image" src="{% static experience.image %}" alt="{{ experience.title }}" width="96" height="96" loading="lazy">
-                        {% endif %}
-                        <h2>{{ experience.title }}</h2>
-                        {% if experience.year %}
-                        <p class="experience-year">{{ experience.year }}</p>
-                        {% endif %}
-                        <p class="experience-description">
-                            {{ experience.description }}
-                        </p>
+                        <img class="skill-image" src="{% static skill.image %}" alt="{{ skill.name }}" width="64" height="64" loading="lazy">
+                        <h2>{{ skill.name }}</h2>
+                        <p>{{ skill.description }}</p>
                     </article>
                     {% empty %}
                     <p class="empty-state">
-                        Belum ada pengalaman yang ditambahkan.
+                        Belum ada skill yang ditambahkan.
                     </p>
                     {% endfor %}
                 </div>
