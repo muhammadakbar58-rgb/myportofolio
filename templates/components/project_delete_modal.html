@@ -1,3 +1,4 @@
+{% url 'main:delete_project' project.id as delete_url %}
 <p class="experience-status">
     <button type="button"
             class="button button-danger"
@@ -23,7 +24,7 @@
                 class="project-delete-modal__close"
                 popovertarget="delete-project-{{ project.id }}"
                 popovertargetaction="hide"
-                aria-label="Tutup konfirmasi hapus">×</button>
+                aria-label="Tutup konfirmasi hapus">&times;</button>
         <h2 id="delete-project-title-{{ project.id }}">Hapus Projek?</h2>
         <p>
             Apakah Anda yakin ingin menghapus
@@ -34,7 +35,7 @@
                     class="button button-secondary"
                     popovertarget="delete-project-{{ project.id }}"
                     popovertargetaction="hide">Batal</button>
-            <form method="post" action="{% url 'main:delete_project' project.id %}">
+            <form method="post" action="{{ delete_url }}">
                 {% csrf_token %}
                 <button type="submit" class="button button-danger">Ya, Hapus</button>
             </form>

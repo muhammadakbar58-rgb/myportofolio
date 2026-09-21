@@ -4,7 +4,7 @@
 {% endblock meta %}
 {% block content %}
     <main>
-        <section class="experience-section" id="experience">
+        <section class="experience-section" id="projects">
             <div class="container">
                 <p class="section-kicker">Karya yang saya bangun</p>
                 <div class="project-header">
@@ -26,26 +26,9 @@
                            aria-label="Cari berdasarkan nama proyek">
                     <button type="submit" class="button">Cari</button>
                 </form>
-                <div class="experience-grid project-grid">
+                <div id="project-list" class="experience-grid project-grid">
                     {% for project in project_list %}
-                        <article class="experience-card">
-                            {% if project.project_image_url %}
-                                <img src="{{ project.project_image_url }}"
-                                     alt="Gambar {{ project.title }}"
-                                     class="project-image">
-                            {% endif %}
-                            <h2>{{ project.title }}</h2>
-                            <span class="experience-category">{{ project.tech_stack }}</span>
-                            <p class="experience-description">{{ project.description }}</p>
-                            <div class="project-card-actions">
-                                <div class="project-actions">
-                                    {% if project.project_url %}
-                                        <a href="{{ project.project_url }}" class="button">Lihat Project</a>
-                                    {% endif %}
-                                    {% include "components/project_delete_modal.html" with project=project %}
-                                </div>
-                            </div>
-                        </article>
+                        {% include "components/project_card.html" with project=project %}
                     {% empty %}
                         {% if title_query %}
                             <p class="empty-state">Tidak ada proyek dengan nama tersebut.</p>

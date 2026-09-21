@@ -1,6 +1,7 @@
 
 
   {% extends 'base.html' %}
+  {% load static %}
   {% block content %}
     <main>
 
@@ -25,7 +26,7 @@
 
                     <img
                         class="avatar"
-                        src="/static/img/profilepic.png"
+                        src="{% static 'img/profilepic.png' %}"
                         alt="Photo of {{ name }}"
                     >
 

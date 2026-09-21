@@ -606,3 +606,49 @@ html {
         text-align: center;
     }
 }
+/* Shared feedback and small adjustments for the existing project UI. */
+.site-messages {
+    margin-top: 1rem;
+}
+
+.site-message {
+    padding: 0.75rem 1rem;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+}
+
+.project-form {
+    padding: 1.5rem;
+    background: var(--card-bg);
+    border-radius: var(--radius);
+}
+
+.project-delete-modal__content {
+    background: var(--card-bg);
+}
+
+.project-grid .experience-card {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+#projects-status:not(:empty),
+#projects-retry {
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 600px) {
+    .site-header .container {
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .site-header nav {
+        flex-wrap: wrap;
+        gap: 0.75rem 1rem;
+    }
+
+    .project-grid {
+        grid-template-columns: 1fr;
+    }
+}

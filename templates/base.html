@@ -11,9 +11,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
 
     {% block meta %}
+    <title>{{ name }} - Portfolio</title>
     {% endblock meta %}
 </head>
 
@@ -30,11 +31,20 @@
                 <a href="{% url 'main:show_main' %}">Profile</a>
                 <a href="{% url 'main:show_experience' %}">Experience</a>
                 <a href="{% url 'main:show_skills' %}">Skills</a>
+                <a href="{% url 'main:show_projects' %}">Projects</a>
             </nav>
 
         </div>
     </header>
 
+
+    {% if messages %}
+        <div class="container site-messages" role="status">
+            {% for message in messages %}
+                <p class="site-message">{{ message }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
 
     {% block content %}
     {% endblock content %}
