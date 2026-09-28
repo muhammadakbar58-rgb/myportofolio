@@ -1,0 +1,14 @@
+{% url edit_url_name item.id as edit_url %}
+{% url delete_url_name item.id as delete_url %}
+{% url star_url_name item.id as star_url %}
+<div class="project-card-actions">
+    <div class="project-actions">
+        {% if can_edit_portfolio %}
+            <a href="{{ edit_url }}" class="button button-secondary">Edit {{ item_label }}</a>
+        {% endif %}
+        {% include "components/portfolio_item_star.html" with item=item star_url=star_url %}
+        {% if user.is_superuser %}
+            {% include "components/portfolio_item_delete_modal.html" with item=item delete_url=delete_url %}
+        {% endif %}
+    </div>
+</div>

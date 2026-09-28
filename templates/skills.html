@@ -8,7 +8,14 @@
         <section class="experience-section" id="skills">
             <div class="container">
                 <p class="section-kicker">Kemampuan yang saya kembangkan</p>
-                <h1>Skills</h1>
+                <div class="project-header">
+                    <h1>Skills</h1>
+                    {% if user.is_superuser %}
+                        <a href="{% url 'main:create_skill' %}" class="button project-add-button">
+                            <span aria-hidden="true">+</span> Tambah Skill
+                        </a>
+                    {% endif %}
+                </div>
 
                 <div class="experience-grid">
                     {% for skill in skill_list %}
@@ -16,6 +23,7 @@
                         <img class="skill-image" src="{% static skill.image %}" alt="{{ skill.name }}" width="64" height="64" loading="lazy">
                         <h2>{{ skill.name }}</h2>
                         <p>{{ skill.description }}</p>
+                        {% include "components/portfolio_item_actions.html" with item=skill item_label="Skill" edit_url_name="main:update_skill" delete_url_name="main:delete_skill" star_url_name="main:toggle_skill_star" %}
                     </article>
                     {% empty %}
                     <p class="empty-state">

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block meta %}
+    <title>{% if item %}Edit{% else %}Tambah{% endif %} {{ item_label }} - {{ name }}</title>
+{% endblock meta %}
+{% block content %}
+<main>
+    <section class="experience-section">
+        <div class="container">
+            <h1>{% if item %}Edit{% else %}Tambah{% endif %} {{ item_label }}</h1>
+            <form method="post" action="{{ request.path }}" class="project-form">
+                {% csrf_token %}
+                {% for error in form.non_field_errors %}
+                    <p class="form-error" role="alert">{{ error }}</p>
+                {% endfor %}
+                {% for field in form %}
+                    <div class="form-group">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}{% if not field.field.required %} (opsional){% endif %}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <p id="{{ field.auto_id }}_helptext">{{ field.help_text }}</p>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <p class="form-error" role="alert">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+                <button type="submit" class="button">{% if item %}Simpan Perubahan{% else %}Tambah {{ item_label }}{% endif %}</button>
+                <a href="{% url list_url_name %}" class="button button-secondary">Batal</a>
+            </form>
+        </div>
+    </section>
+</main>
+{% endblock content %}
