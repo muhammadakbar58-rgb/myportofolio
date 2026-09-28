@@ -1,20 +1,48 @@
 {% url 'main:update_project' project.id as update_url %}
+
 <article class="experience-card" data-project-id="{{ project.id }}">
+
     {% if project.project_image_url %}
         <img src="{{ project.project_image_url }}"
              alt="Gambar {{ project.title }}"
-             class="project-image" loading="lazy">
+             class="project-image"
+             loading="lazy">
     {% endif %}
+
     <h2>{{ project.title }}</h2>
-    <span class="experience-category">{{ project.tech_stack }}</span>
-    <p class="experience-description">{{ project.description }}</p>
+
+    <span class="experience-category">
+        {{ project.tech_stack }}
+    </span>
+
+    <p class="experience-description">
+        {{ project.description }}
+    </p>
+
     <div class="project-card-actions">
         <div class="project-actions">
+
             {% if project.project_url %}
-                <a href="{{ project.project_url }}" class="button project-link">Lihat Project</a>
+                <a href="{{ project.project_url }}"
+                   class="button project-link">
+                    Lihat Project
+                </a>
             {% endif %}
-            <a href="{{ update_url }}" class="button button-secondary project-edit">Edit Proyek</a>
-            {% include "components/project_delete_modal.html" with project=project %}
+
+            {% if can_edit_projects %}
+                <a href="{{ update_url }}"
+                   class="button button-secondary project-edit">
+                    Edit Proyek
+                </a>
+            {% endif %}
+
+            {% include "components/project_star.html" with project=project %}
+
+            {% if user.is_superuser %}
+                {% include "components/project_delete_modal.html" with project=project %}
+            {% endif %}
+
         </div>
     </div>
+
 </article>

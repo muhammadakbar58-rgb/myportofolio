@@ -1,6 +1,6 @@
-from django.forms import ModelForm, TextInput, Textarea, URLInput
+from django.forms import DateTimeInput, ModelForm, TextInput, Textarea, URLInput
 
-from main.models import Project
+from main.models import Experience, Project, Skill
 
 class ProjectForm(ModelForm):
     class Meta:
@@ -49,4 +49,49 @@ class ProjectForm(ModelForm):
                     "placeholder": "https://drive.google.com/thumbnail?id=...&sz=w1000",
                 }
             ),
+        }
+
+
+class ExperienceForm(ModelForm):
+    class Meta:
+        model = Experience
+        fields = ["title", "description", "category", "image", "year", "thumbnail", "ended_at"]
+        labels = {
+            "title": "Nama Pengalaman",
+            "description": "Deskripsi",
+            "category": "Kategori",
+            "image": "Gambar",
+            "year": "Tahun",
+            "thumbnail": "URL Thumbnail",
+            "ended_at": "Tanggal Selesai",
+        }
+        help_texts = {
+            "image": "Path gambar di folder static, misalnya img/company.png.",
+            "ended_at": "Kosongkan jika masih berlangsung.",
+        }
+        widgets = {
+            "description": Textarea(attrs={"rows": 3}),
+            "image": TextInput(attrs={"placeholder": "img/company.png"}),
+            "year": TextInput(attrs={"placeholder": "2025 - Present"}),
+            "ended_at": DateTimeInput(
+                format="%Y-%m-%dT%H:%M", attrs={"type": "datetime-local"}
+            ),
+        }
+
+
+class SkillForm(ModelForm):
+    class Meta:
+        model = Skill
+        fields = ["name", "description", "image"]
+        labels = {
+            "name": "Nama Skill",
+            "description": "Deskripsi",
+            "image": "Gambar",
+        }
+        help_texts = {
+            "image": "Path gambar di folder static, misalnya img/python.png.",
+        }
+        widgets = {
+            "description": Textarea(attrs={"rows": 3}),
+            "image": TextInput(attrs={"placeholder": "img/python.png"}),
         }

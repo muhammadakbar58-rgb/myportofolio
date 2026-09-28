@@ -9,11 +9,13 @@
                 <p class="section-kicker">Karya yang saya bangun</p>
                 <div class="project-header">
                     <h1>Projects</h1>
+                    {% if user.is_superuser %}
                     <a href="{% url 'main:create_project' %}"
                        class="button project-add-button">
                         <span aria-hidden="true">+</span>
                         Tambah Proyek
                     </a>
+                    {% endif %}
                 </div>
                 <form method="get"
                       action="{% url 'main:show_projects' %}"

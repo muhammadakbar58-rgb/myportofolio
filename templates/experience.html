@@ -8,7 +8,14 @@
         <section class="experience-section" id="experience">
             <div class="container">
                 <p class="section-kicker">Perjalanan saya sejauh ini</p>
-                <h1>Experience</h1>
+                <div class="project-header">
+                    <h1>Experience</h1>
+                    {% if user.is_superuser %}
+                        <a href="{% url 'main:create_experience' %}" class="button project-add-button">
+                            <span aria-hidden="true">+</span> Tambah Pengalaman
+                        </a>
+                    {% endif %}
+                </div>
 
                 <div class="experience-grid">
                     {% for experience in experience_list %}
@@ -23,6 +30,7 @@
                         <p class="experience-description">
                             {{ experience.description }}
                         </p>
+                        {% include "components/portfolio_item_actions.html" with item=experience item_label="Pengalaman" edit_url_name="main:update_experience" delete_url_name="main:delete_experience" star_url_name="main:toggle_experience_star" %}
                     </article>
                     {% empty %}
                     <p class="empty-state">

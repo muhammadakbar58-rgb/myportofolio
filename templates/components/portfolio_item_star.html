@@ -1,0 +1,21 @@
+{% if user.is_authenticated %}
+<form method="post" action="{{ star_url }}" class="star-form">
+    {% csrf_token %}
+    <button type="submit"
+            aria-pressed="{{ item.is_starred|yesno:'true,false' }}"
+            class="button button-star{% if item.is_starred %} is-starred{% endif %}"
+            title="{% if item.starred_by.all %}Dibintangi oleh {{ item.starred_by.all|join:', ' }}{% else %}Jadilah yang pertama memberi star{% endif %}">
+        <span aria-hidden="true">&#9733;</span>
+        {% if item.is_starred %}Unstar{% else %}Star{% endif %}
+        <span class="star-count">{{ item.starred_by.count }}</span>
+    </button>
+</form>
+{% else %}
+<a href="{% url 'main:login' %}?next={{ request.get_full_path|urlencode }}"
+   class="button button-star"
+   title="Login untuk memberi star">
+    <span aria-hidden="true">&#9733;</span>
+    Star
+    <span class="star-count">{{ item.starred_by.count }}</span>
+</a>
+{% endif %}

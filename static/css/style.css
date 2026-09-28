@@ -358,7 +358,8 @@ html {
 }
 
 .form-group input,
-.form-group textarea {
+.form-group textarea,
+.form-group select {
     width: 100%;
     box-sizing: border-box;
     padding: 0.7rem;
@@ -371,7 +372,8 @@ html {
 }
 
 .form-group input:focus,
-.form-group textarea:focus {
+.form-group textarea:focus,
+.form-group select:focus {
     outline: 2px solid var(--accent);
     border-color: var(--accent);
 }
@@ -651,4 +653,25 @@ html {
     .project-grid {
         grid-template-columns: 1fr;
     }
+}
+.star-form {
+    display: inline;
+}
+
+.button-star {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--ink);
+}
+
+.button-star.is-starred {
+    background: var(--accent);
+}
+
+.star-count {
+    padding: 0.05rem 0.4rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.25);
+    font-size: 0.8rem;
 }
