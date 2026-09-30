@@ -42,3 +42,4 @@ AI disclosure : Dalam menerjakan tugas ini,saya menggunakan AI sebagai alat bant
 ### Tugas 4
 AI disclosure : Saya menggunakan AI untuk membantu memahami tugas, meninjau ide implementasi Django, dan memperbaiki struktur kode. Seluruh saran yang diberikan AI telah saya tinjau ulang, disesuaikan, dan uji terlebih dahulu sebelum dimasukkan ke dalam program.
 notes : mohon maaf kak asdos saya mengumpulkan link commit yang sama untuk tugas dan tutorial dikarenakan saya lupa commit and push pada saat selesai menerjakan tutorial.
+AI disclosure : Saya menggunakan AI untuk membantu memahami tugas, meninjau ide implementasi Django, dan memperbaiki struktur kode. Seluruh saran yang diberikan AI telah saya tinjau ulang, disesuaikan, dan uji terlebih dahulu sebelum dimasukkan ke dalam program.
