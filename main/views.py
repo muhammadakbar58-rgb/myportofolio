@@ -4,12 +4,13 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from django.core import serializers
 from django.core.exceptions import PermissionDenied
 from django.db.models import Prefetch
-from django.http import HttpResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
+from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from main.forms import ExperienceForm, ProjectForm, SkillForm
@@ -71,11 +72,13 @@ def _with_star_status(items, user):
     return items
 
 
+@ensure_csrf_cookie
 def show_projects(request):
     project_list = _with_star_status(_filtered_projects(request), request.user)
     context = {
         "name": "Muhammad Akbar Rinaldy",
         "project_list": project_list,
+        "form": ProjectForm(),
         "can_edit_projects": _can_edit_portfolio(request.user),
         "title_query": request.GET.get("title", "").strip(),
     }
@@ -126,14 +129,46 @@ def update_project(request, project_id):
 
 
 @require_GET
+@never_cache
 def get_projects_json(request):
-    # Keep the existing JSON structure while exposing only public project fields.
-    projects_json = serializers.serialize(
-        "json",
-        _filtered_projects(request),
-        fields=("title", "description", "tech_stack", "project_url", "project_image_url"),
-    )
-    return HttpResponse(projects_json, content_type="application/json")
+    # Preserve pk/fields/model while adding the current user's star status.
+    data = []
+    for project in _with_star_status(_filtered_projects(request), request.user):
+        starred_users = project.starred_by.all()
+        data.append({
+            "model": "main.project",
+            "pk": str(project.pk),
+            "fields": {
+                "title": project.title,
+                "description": project.description,
+                "tech_stack": project.tech_stack,
+                "project_url": project.project_url,
+                "project_image_url": project.project_image_url,
+                "star_count": len(starred_users),
+                "is_starred": project.is_starred,
+                "starred_by_names": ", ".join(user.username for user in starred_users),
+            },
+        })
+    return JsonResponse(data, safe=False)
+
+
+@require_POST
+def create_project_ajax(request):
+    # JSON errors let fetch detect an expired session without following a login redirect.
+    if not request.user.is_authenticated or not request.user.is_superuser:
+        return JsonResponse(
+            {"message": "Hanya pemilik portofolio yang dapat menambahkan proyek."},
+            status=403,
+        )
+
+    form = ProjectForm(request.POST)
+    if form.is_valid():
+        project = form.save()
+        return JsonResponse(
+            {"message": "Proyek berhasil ditambahkan.", "pk": str(project.pk)},
+            status=201,
+        )
+    return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
 
 
 @require_POST

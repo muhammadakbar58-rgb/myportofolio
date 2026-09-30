@@ -202,7 +202,7 @@ class ProjectCRUDTest(TestCase):
         self.assertContains(response, self.project.title)
         self.assertContains(response, f'href="{self.update_url}"')
         self.assertContains(response, f'action="{self.delete_url}"')
-        self.assertNotContains(response, "<script")
+        self.assertContains(response, 'src="/static/js/projects.js"')
         self.assertNotContains(response, "<template")
         self.assertNotContains(response, "data-json-url")
         self.assertContains(response, f'src="{self.data["project_image_url"]}"')
@@ -278,7 +278,10 @@ class ProjectCRUDTest(TestCase):
         for field, value in data.items():
             self.assertEqual(getattr(self.project, field), value)
         self.assertEqual(Project.objects.count(), 1)
-        self.assertEqual(self.client.get(self.json_url).json()[0]["fields"], data)
+        self.assertEqual(
+            {key: value for key, value in self.client.get(self.json_url).json()[0]["fields"].items()
+             if key in data}, data,
+        )
 
     def test_invalid_update_preserves_database_and_submitted_values(self):
         data = {**self.data, "title": "Unsaved title", "project_url": "invalid"}
@@ -315,7 +318,10 @@ class ProjectCRUDTest(TestCase):
         self.assertEqual(response["Content-Type"], "application/json")
         data = {item["pk"]: item for item in response.json()}
         self.assertEqual(set(data), {str(self.project.pk), str(other.pk)})
-        self.assertEqual(data[str(self.project.pk)]["fields"], self.data)
+        self.assertEqual(
+            {key: value for key, value in data[str(self.project.pk)]["fields"].items()
+             if key in self.data}, self.data,
+        )
         self.assertEqual(data[str(self.project.pk)]["model"], "main.project")
 
     def test_search_filters_both_html_and_json(self):
@@ -543,16 +549,20 @@ class ProjectAccessTest(TestCase):
         self.assertEqual(response.status_code, 404)
         self.assertEqual(self.project.starred_by.count(), 0)
 
-    def test_public_json_exposes_only_project_fields_even_after_star(self):
+    def test_public_json_exposes_project_and_public_star_fields(self):
         self.project.starred_by.add(self.user)
         response = self.client.get(reverse("main:get_projects_json"))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), [{
             "model": "main.project",
             "pk": str(self.project.pk),
-            "fields": {**self.data, "project_url": "", "project_image_url": ""},
+            "fields": {
+                **self.data, "project_url": "", "project_image_url": "",
+                "star_count": 1, "is_starred": False,
+                "starred_by_names": self.user.username,
+            },
         }])
-        for private_value in (self.user.username, self.user.password, "starred_by", "session", "token"):
+        for private_value in (self.user.password, '"starred_by":', "session", "token"):
             self.assertNotContains(response, private_value)
         self.assertEqual(
             self.client.post(reverse("main:get_projects_json")).status_code, 405

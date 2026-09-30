@@ -1,26 +1,38 @@
 {% extends "base.html" %}
+{% load static %}
 {% block meta %}
     <title>Projects - {{ name }}</title>
 {% endblock meta %}
 {% block content %}
     <main>
-        <section class="experience-section" id="projects">
+        <section class="experience-section" id="projects"
+                 data-projects-url="{% url 'main:get_projects_json' %}"
+                 data-authenticated="{{ user.is_authenticated|yesno:'true,false' }}"
+                 data-login-url="{% url 'main:login' %}"
+                 data-star-url="{% url 'main:toggle_star' '00000000-0000-0000-0000-000000000000' %}"
+                 {% if can_edit_projects %}
+                 data-edit-url="{% url 'main:update_project' '00000000-0000-0000-0000-000000000000' %}"
+                 {% endif %}
+                 {% if user.is_superuser %}
+                 data-delete-url="{% url 'main:delete_project' '00000000-0000-0000-0000-000000000000' %}"
+                 {% endif %}>
             <div class="container">
                 <p class="section-kicker">Karya yang saya bangun</p>
                 <div class="project-header">
                     <h1>Projects</h1>
                     {% if user.is_superuser %}
-                    <a href="{% url 'main:create_project' %}"
-                       class="button project-add-button">
+                    <button type="button" class="button project-add-button"
+                            popovertarget="add-project-modal">
                         <span aria-hidden="true">+</span>
                         Tambah Proyek
-                    </a>
+                    </button>
+                    <noscript><a href="{% url 'main:create_project' %}">Buka halaman tambah proyek</a></noscript>
                     {% endif %}
                 </div>
-                <form method="get"
+                <form id="project-search-form" method="get"
                       action="{% url 'main:show_projects' %}"
                       class="project-search">
-                    <input type="search"
+                    <input type="search" id="search-input"
                            name="title"
                            value="{{ title_query }}"
                            placeholder="Cari berdasarkan nama proyek"
@@ -28,6 +40,8 @@
                            aria-label="Cari berdasarkan nama proyek">
                     <button type="submit" class="button">Cari</button>
                 </form>
+                <p id="projects-status" role="status" aria-live="polite"></p>
+                <button id="projects-retry" type="button" class="button button-secondary hide">Coba lagi</button>
                 <div id="project-list" class="experience-grid project-grid">
                     {% for project in project_list %}
                         {% include "components/project_card.html" with project=project %}
@@ -42,4 +56,11 @@
             </div>
         </section>
     </main>
+    <div id="projects-csrf" hidden>{% csrf_token %}</div>
+    {% if user.is_superuser %}
+        {% include "components/project_form_modal.html" %}
+    {% endif %}
 {% endblock content %}
+{% block scripts %}
+    <script src="{% static 'js/projects.js' %}" defer></script>
+{% endblock scripts %}

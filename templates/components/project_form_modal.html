@@ -1,0 +1,28 @@
+<div id="add-project-modal" class="project-form-modal" popover="auto"
+     role="dialog" aria-modal="true" aria-labelledby="add-project-modal-title">
+    <button type="button" class="project-form-modal__backdrop"
+            popovertarget="add-project-modal" popovertargetaction="hide"
+            aria-label="Tutup form tambah proyek"></button>
+    <div class="project-form-modal__content">
+        <button type="button" class="project-form-modal__close"
+                popovertarget="add-project-modal" popovertargetaction="hide"
+                aria-label="Tutup form tambah proyek">&times;</button>
+        <h2 id="add-project-modal-title">Tambah Proyek Baru</h2>
+        <form id="project-form" method="post" action="{% url 'main:create_project' %}"
+              data-ajax-url="{% url 'main:create_project_ajax' %}" class="project-form">
+            {% csrf_token %}
+            <p id="project-form-error" class="form-error" role="alert"></p>
+            {% for field in form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}{% if not field.field.required %} (opsional){% endif %}</label>
+                    {{ field }}
+                </div>
+            {% endfor %}
+            <div class="project-form-modal__actions">
+                <button type="button" class="button button-secondary"
+                        popovertarget="add-project-modal" popovertargetaction="hide">Batal</button>
+                <button type="submit" class="button">Tambah Proyek</button>
+            </div>
+        </form>
+    </div>
+</div>
