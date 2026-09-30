@@ -1,57 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>{{ name }} - Portfolio</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-
-    <link rel="stylesheet" href="/static/css/style.css">
-</head>
-
-<body>
-
-    <header class="site-header">
-        <div class="container">
-
-            <a href="{% url 'main:show_main' %}" class="brand">{{ name }}</a>
-
-            <nav>
-                <a href="{% url 'main:show_main' %}">Profile</a>
-                <a href="{% url 'main:show_experience' %}">Experience</a>
-            </nav>
-
-        </div>
-    </header>
-
-
+{% extends "base.html" %}
+{% load static %}
+{% block meta %}
+    <title>Experience - {{ name }}</title>
+{% endblock meta %}
+{% block content %}
     <main>
         <section class="experience-section" id="experience">
             <div class="container">
                 <p class="section-kicker">Perjalanan saya sejauh ini</p>
-                <h1>Experience</h1>
+                <div class="project-header">
+                    <h1>Experience</h1>
+                    {% if user.is_superuser %}
+                        <a href="{% url 'main:create_experience' %}" class="button project-add-button">
+                            <span aria-hidden="true">+</span> Tambah Pengalaman
+                        </a>
+                    {% endif %}
+                </div>
 
                 <div class="experience-grid">
                     {% for experience in experience_list %}
                     <article class="experience-card">
-                        <span class="experience-category">
-                            {{ experience.get_category_display }}
-                        </span>
+                        {% if experience.image %}
+                        <img class="experience-image" src="{% static experience.image %}" alt="{{ experience.title }}" width="96" height="96" loading="lazy">
+                        {% endif %}
                         <h2>{{ experience.title }}</h2>
+                        {% if experience.year %}
+                        <p class="experience-year">{{ experience.year }}</p>
+                        {% endif %}
                         <p class="experience-description">
                             {{ experience.description }}
                         </p>
-
-                        {% if experience.is_ongoing %}
-                        <p class="experience-status">Sedang berlangsung</p>
-                        {% else %}
-                        <p class="experience-status">Selesai</p>
-                        {% endif %}
+                        {% include "components/portfolio_item_actions.html" with item=experience item_label="Pengalaman" edit_url_name="main:update_experience" delete_url_name="main:delete_experience" star_url_name="main:toggle_experience_star" %}
                     </article>
                     {% empty %}
                     <p class="empty-state">
@@ -62,18 +41,4 @@
             </div>
         </section>
     </main>
-
-    <footer>
-        <div class="container">
-
-            <p>
-                &copy; 2026 {{ name }}.
-                Fakultas Ilmu Komputer, Universitas Indonesia.
-            </p>
-
-        </div>
-    </footer>
-
-</body>
-
-</html>
+{% endblock content %}

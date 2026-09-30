@@ -1,0 +1,43 @@
+<p class="experience-status">
+    <button type="button"
+            class="button button-danger"
+            popovertarget="delete-item-{{ item.id }}"
+            aria-label="Hapus {{ item }}"
+            title="Hapus {{ item_label }}">
+        Hapus {{ item_label }}
+    </button>
+</p>
+<div id="delete-item-{{ item.id }}"
+     class="project-delete-modal"
+     popover="auto"
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="delete-item-title-{{ item.id }}">
+    <button type="button"
+            class="project-delete-modal__backdrop"
+            popovertarget="delete-item-{{ item.id }}"
+            popovertargetaction="hide"
+            aria-label="Tutup konfirmasi hapus"></button>
+    <div class="project-delete-modal__content">
+        <button type="button"
+                class="project-delete-modal__close"
+                popovertarget="delete-item-{{ item.id }}"
+                popovertargetaction="hide"
+                aria-label="Tutup konfirmasi hapus">&times;</button>
+        <h2 id="delete-item-title-{{ item.id }}">Hapus {{ item_label }}?</h2>
+        <p>
+            Apakah Anda yakin ingin menghapus
+            <strong>{{ item }}</strong>?
+        </p>
+        <div class="project-delete-modal__actions">
+            <button type="button"
+                    class="button button-secondary"
+                    popovertarget="delete-item-{{ item.id }}"
+                    popovertargetaction="hide">Batal</button>
+            <form method="post" action="{{ delete_url }}">
+                {% csrf_token %}
+                <button type="submit" class="button button-danger">Ya, Hapus</button>
+            </form>
+        </div>
+    </div>
+</div>

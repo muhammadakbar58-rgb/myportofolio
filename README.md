@@ -19,3 +19,27 @@ Untuk pengembangan selanjutnya, saya ingin menambahkan section procejt ke dalam 
 AI Disclosure : Dalam proses pembuatan website ini, saya menggunakan AI sebagai alat bantu untuk mencari ide, memahami HTML/CSS, dan memperbaiki beberapa masalah pada kode. Terutama dalam hal memahami syntax HTML dan CSS karena kedua bahasa ini baru bagi saya. Saya juga memberikan prompt yang spesifik dengan menjelaskan masalah dan hasil yang saya inginkan.
 
 Saya juga tetap melakukan pengecekan dan perbaikan secara manual. Contohnya, setelah mengubah background dan warna header dengan bantuan AI karena saya tidak mengetahui kode warnyanya, ada teks yang kurang terlihat karena warnanya mirip dengan background. Lalu saya menyesuaikan warna teks secara manual agar lebih mudah dibaca. Jadi, AI saya gunakan sebagai alat bantu, sementara hasil akhirnya tetap saya periksa dan sesuaikan sendiri.
+
+### Tugas 2
+1. Saat user membuka halaman skills. request akan masuk ke urls.py proyek lalu diteruskan ke urls.py aplikasi main. Setelah URL yang sesuai ditemukan, django akan menjalankan view yang mengambil data dari model dan memasukkannya ke context. Data tersebut kemudian dikirim ke template untuk ditampilkan dalam bentuk HTML. Hasil akhirnya dikirim kembali ke browser dan ditampilkan kepada user.
+
+2. Data baiknya disimpan di model supaya kita tidak perlu menulis data langsung di HTML. jadi jika ingin menambah atau mengubah data, kita cukup mengubah data di database tanpa harus mengubah template. Template hanya bertugas mengatur bagaimana data tersebut ditampilkan. alhasil cara ini membuat project lebih rapi dan lebih mudah dikembangkan ketika datanya semakin banyak.
+
+3. makemigrations digunakan untuk mencatat perubahan yang kita buat pada model ke dalam file migration, sedangkan migrate digunakan untuk menerapkan perubahan tersebut ke database. Contohnya, saat saya menambahkan field image dan year pada model Experience, saya perlu menjalankan kedua perintah tersebut. Saya menjalankan python manage.py makemigrations terlebih dahulu, lalu python manage.py migrate agar perubahan model benar-benar diterapkan ke database.
+
+AI disclosure: Saya menggunakan AI (chatgpt dan Codex) sebagai alat bantu selama proses pengerjaan tugas ini. AI membantu saya dalam memahami konsep MVT Django, memberikan saran struktur kode, serta membantu implementasi dan debugging beberapa bagian project. Saya tetap mengecek ulang dan menyesuaikan kode yang diberikan agar sesuai dengan kebutuhan dan ketentuan tugas. AI digunakan sebagai pendukung proses belajar dan pengembangan, bukan untuk menggantikan pemahaman saya terhadap kode yang dibuat.
+
+
+### Tugas 3
+1. ModelForm digunakan karena dapat membuat form secara otomatis berdasarkan model yang sudah kita buat di Django.jadi kita tidak perlu menulis setiap input HTML secara manual dan proses validasi serta penyimpanan data ke database juga menjadi lebih mudah. {% csrf_token %} digunakan untuk melindungi form dari serangan Cross-Site Request Forgery (CSRF) dengan memastikan bahwa request yang dikirim melalui form memang berasal dari halaman aplikasi kita.
+
+2. JSON lebih banyak digunakan formatnya lebih sederhana dibandingkan XML. JSON juga memiliki struktur yang mirip dengan object pada js dan mudah diproses oleh berbagai bahasa pemrograman.XML membutuhkan banyak tag pembuka dan penutup, alasan- alasan tersebut adalah kenapa JSON banyak digunakan pada API dan komunikasi data pada aplikasi web modern.
+
+3. Ketika user mengakses URL yang mengarah ke view JSON, Django akan menjalankan fungsi view tersebut dan mengambil data portofolio dari database melalui model. Data dari database masih berupa object/model Django, sehingga tidak bisa langsung dikirim sebagai JSON. Karena itu, dilakukan proses serialization, yaitu adalah mengubah object Django menjadi format data yang dapat direpresentasikan dan dikirim sebagai JSON. Setelah proses tersebut selesai, view mengembalikan data JSON melalui HTTP response sehingga data tersebut dapat digunakan oleh client atau bagian lain dari aplikasi.
+
+AI disclosure : Dalam menerjakan tugas ini,saya menggunakan AI sebagai alat bantu untuk memahami konsep Django, khususnya penggunaan ModelForm, implementasi CRUD, serta proses serialization dan deserialization data JSON. AI juga saya gunakan untuk membantu memberikan saran dalam melakukan refactoring kode dan debugging ketika terdapat error. Seluruh kode yang dihasilkan tetap saya tinjau, sesuaikan dengan materi yang telah dipelajari, dan uji kembali untuk memastikan program dapat berjalan dengan baik.
+
+### Tugas 4
+AI disclosure : Saya menggunakan AI untuk membantu memahami tugas, meninjau ide implementasi Django, dan memperbaiki struktur kode. Seluruh saran yang diberikan AI telah saya tinjau ulang, disesuaikan, dan uji terlebih dahulu sebelum dimasukkan ke dalam program.
+notes : mohon maaf kak asdos saya mengumpulkan link commit yang sama untuk tugas dan tutorial dikarenakan saya lupa commit and push pada saat selesai menerjakan tutorial.
+AI disclosure : Saya menggunakan AI untuk membantu memahami tugas, meninjau ide implementasi Django, dan memperbaiki struktur kode. Seluruh saran yang diberikan AI telah saya tinjau ulang, disesuaikan, dan uji terlebih dahulu sebelum dimasukkan ke dalam program.
