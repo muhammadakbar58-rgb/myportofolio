@@ -13,8 +13,11 @@
     const csrfToken = document.querySelector("#projects-csrf input").value;
     const authenticated = section.dataset.authenticated === "true";
     const placeholderId = "00000000-0000-0000-0000-000000000000";
-    const SEARCH_DEBOUNCE_DELAY = 300;
-    let searchDebounceTimer;
+    const technologyFilter = document.getElementById("technology-filter");
+    const filterControls = document.getElementById("project-filters");
+    const results = document.getElementById("projects-results");
+    const emptyState = document.getElementById("projects-empty");
+    let cards = [];
     let projectsAbortController;
     let submitting = false;
 
@@ -116,13 +119,94 @@
         return article;
     }
 
+    function indexCards() {
+        cards = [...grid.querySelectorAll("[data-project-id]")].map(card => {
+            const title = card.querySelector("h2").textContent.trim();
+            const description = card.querySelector(".experience-description");
+            const fullDescription = description.textContent.trim();
+            const techStack = card.querySelector(".experience-category").textContent.trim();
+            const technologies = techStack.split(/[,;|\n]/).map(value => value.trim()).filter(Boolean);
+
+            // Short descriptions remain fully visible without an unnecessary control.
+            if (fullDescription.length > 240) {
+                const preview = fullDescription.slice(0, 240).trimEnd() + "...";
+                description.id = "project-description-" + card.dataset.projectId;
+                description.textContent = preview;
+                const toggle = document.createElement("button");
+                toggle.type = "button";
+                toggle.className = "description-toggle";
+                toggle.textContent = "Selengkapnya";
+                toggle.setAttribute("aria-expanded", "false");
+                toggle.setAttribute("aria-controls", description.id);
+                toggle.setAttribute("aria-label", "Selengkapnya tentang " + title);
+                description.after(toggle);
+                toggle.addEventListener("click", () => {
+                    const expanded = toggle.getAttribute("aria-expanded") !== "true";
+                    toggle.setAttribute("aria-expanded", String(expanded));
+                    toggle.textContent = expanded ? "Lebih sedikit" : "Selengkapnya";
+                    toggle.setAttribute("aria-label", toggle.textContent + " tentang " + title);
+                    description.textContent = expanded ? fullDescription : preview;
+                });
+            }
+            return {
+                element: card,
+                search: [title, fullDescription, techStack].join(" ").toLowerCase(),
+                technologies,
+            };
+        });
+
+        const selected = technologyFilter.value;
+        const technologies = new Map();
+        cards.forEach(card => card.technologies.forEach(label => {
+            const key = label.toLowerCase();
+            if (!technologies.has(key)) technologies.set(key, label);
+        }));
+        technologyFilter.replaceChildren(new Option("Semua teknologi", ""));
+        [...technologies].sort((a, b) => a[1].localeCompare(b[1])).forEach(([key, label]) => {
+            technologyFilter.add(new Option(label, key));
+        });
+        if (technologies.has(selected)) technologyFilter.value = selected;
+
+        grid.querySelectorAll(":scope > .empty-state").forEach(element => element.remove());
+        filterControls.hidden = false;
+        results.hidden = false;
+        applyFilters();
+    }
+
+    function applyFilters() {
+        const query = searchInput.value.trim().toLowerCase();
+        const technology = technologyFilter.value;
+        let visible = 0;
+        cards.forEach(card => {
+            const matches = card.search.includes(query) &&
+                (!technology || card.technologies.some(value => value.toLowerCase() === technology));
+            card.element.hidden = !matches;
+            if (matches) visible += 1;
+        });
+        results.textContent = visible + " dari " + cards.length + " proyek ditampilkan.";
+        emptyState.hidden = visible > 0;
+        emptyState.textContent = query || technology
+            ? "Tidak ada proyek yang cocok. Coba kata kunci atau teknologi lain."
+            : "Belum ada proyek yang ditambahkan.";
+
+        const pageUrl = new URL(window.location.href);
+        if (searchInput.value.trim()) pageUrl.searchParams.set("title", searchInput.value.trim());
+        else pageUrl.searchParams.delete("title");
+        window.history.replaceState(null, "", pageUrl);
+        if (!authenticated) {
+            grid.querySelectorAll(".button-star").forEach(link => {
+                link.href = section.dataset.loginUrl + "?next=" +
+                    encodeURIComponent(pageUrl.pathname + pageUrl.search);
+            });
+        }
+    }
+
     async function fetchProjects() {
         if (projectsAbortController) projectsAbortController.abort();
         const controller = new AbortController();
         projectsAbortController = controller;
-        const query = searchInput.value.trim();
+        // Fetch the complete collection once, then search/filter locally.
         const url = new URL(section.dataset.projectsUrl, window.location.origin);
-        if (query) url.searchParams.set("title", query);
         status.textContent = "Memuat projects...";
         retry.classList.add("hide");
         grid.setAttribute("aria-busy", "true");
@@ -141,62 +225,45 @@
 
             const cards = document.createDocumentFragment();
             projects.forEach(project => cards.appendChild(buildProjectCardElement(project)));
-            if (!projects.length) {
-                const empty = document.createElement("p");
-                empty.className = "empty-state";
-                empty.textContent = query
-                    ? "Tidak ada proyek dengan nama tersebut."
-                    : "Belum ada proyek yang ditambahkan.";
-                cards.appendChild(empty);
-            }
             grid.replaceChildren(cards);
+            indexCards();
             status.textContent = "";
-
-            // Keep the active search in the address bar and in guest login return links.
-            const pageUrl = new URL(window.location.href);
-            if (query) pageUrl.searchParams.set("title", query);
-            else pageUrl.searchParams.delete("title");
-            window.history.replaceState(null, "", pageUrl);
-            if (!authenticated) {
-                grid.querySelectorAll(".button-star").forEach(link => {
-                    link.href = section.dataset.loginUrl + "?next=" +
-                        encodeURIComponent(pageUrl.pathname + pageUrl.search);
-                });
-            }
         } catch (error) {
             if (controller.signal.aborted) return;
-            status.textContent = "Gagal memuat data projects. Data sebelumnya tetap ditampilkan. Silakan coba lagi.";
+            status.textContent = "Gagal memuat seluruh proyek. Pencarian hanya berlaku pada data yang sudah tampil. Silakan coba lagi.";
             retry.classList.remove("hide");
         } finally {
             if (projectsAbortController === controller) grid.setAttribute("aria-busy", "false");
         }
     }
 
-    function searchProjects() {
-        clearTimeout(searchDebounceTimer);
-        return fetchProjects();
-    }
-
-    searchInput.addEventListener("input", () => {
-        clearTimeout(searchDebounceTimer);
-        // Invalidate old results immediately, including during the debounce delay.
-        if (projectsAbortController) projectsAbortController.abort();
-        searchDebounceTimer = setTimeout(searchProjects, SEARCH_DEBOUNCE_DELAY);
-    });
+    searchInput.placeholder = "Cari nama, deskripsi, atau teknologi";
+    searchInput.setAttribute("aria-label", "Cari nama, deskripsi, atau teknologi");
+    searchInput.setAttribute("aria-controls", "project-list");
+    searchInput.addEventListener("input", applyFilters);
     searchForm.addEventListener("submit", event => {
         event.preventDefault();
-        searchProjects();
+        applyFilters();
     });
-    retry.addEventListener("click", searchProjects);
+    technologyFilter.addEventListener("change", applyFilters);
+    document.getElementById("projects-reset").addEventListener("click", () => {
+        searchInput.value = "";
+        technologyFilter.value = "";
+        applyFilters();
+        searchInput.focus();
+    });
+    retry.addEventListener("click", fetchProjects);
 
     if (projectForm) {
         projectForm.addEventListener("submit", async event => {
             event.preventDefault();
-            if (submitting) return;
+            if (submitting || !projectForm.reportValidity()) return;
             submitting = true;
             const submitButton = projectForm.querySelector('button[type="submit"]');
             const errorMessage = document.getElementById("project-form-error");
+            const submitLabel = submitButton.textContent;
             submitButton.disabled = true;
+            submitButton.textContent = "Menyimpan...";
             errorMessage.textContent = "";
             projectForm.setAttribute("aria-busy", "true");
 
@@ -223,7 +290,7 @@
                 projectForm.reset();
                 document.getElementById("add-project-modal").hidePopover();
                 showToast("Berhasil", "Proyek baru berhasil ditambahkan!", "success");
-                await searchProjects();
+                await fetchProjects();
             } catch (error) {
                 const message = error instanceof TypeError
                     ? "Tidak dapat terhubung ke server. Periksa koneksi dan daftar proyek sebelum mencoba lagi."
@@ -233,10 +300,12 @@
             } finally {
                 submitting = false;
                 submitButton.disabled = false;
+                submitButton.textContent = submitLabel;
                 projectForm.setAttribute("aria-busy", "false");
             }
         });
     }
 
+    indexCards();
     fetchProjects();
 })();

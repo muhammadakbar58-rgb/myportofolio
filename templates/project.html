@@ -40,6 +40,17 @@
                            aria-label="Cari berdasarkan nama proyek">
                     <button type="submit" class="button">Cari</button>
                 </form>
+                <div id="project-filters" class="project-filters" hidden>
+                    <div class="project-filter-field">
+                        <label for="technology-filter">Teknologi</label>
+                        <select id="technology-filter" class="project-search__input" aria-controls="project-list">
+                            <option value="">Semua teknologi</option>
+                        </select>
+                    </div>
+                    <button id="projects-reset" type="button" class="button button-secondary">Reset pencarian &amp; filter</button>
+                </div>
+                <p id="projects-results" class="results-summary" role="status" aria-live="polite" hidden></p>
+                <p id="projects-empty" class="empty-state" hidden></p>
                 <p id="projects-status" role="status" aria-live="polite"></p>
                 <button id="projects-retry" type="button" class="button button-secondary hide">Coba lagi</button>
                 <div id="project-list" class="experience-grid project-grid">

@@ -7,7 +7,7 @@
     <section class="experience-section">
         <div class="container">
             <h1>{% if item %}Edit{% else %}Tambah{% endif %} {{ item_label }}</h1>
-            <form method="post" action="{{ request.path }}" class="project-form">
+            <form method="post" action="{{ request.path }}" class="project-form" data-enhance-form>
                 {% csrf_token %}
                 {% for error in form.non_field_errors %}
                     <p class="form-error" role="alert">{{ error }}</p>

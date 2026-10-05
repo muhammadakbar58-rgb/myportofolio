@@ -11,7 +11,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <!-- Apply the root theme before CSS paints; the button is bound on DOMContentLoaded. -->
+    <!-- Bump this shared version when theme assets change to invalidate browser caches. -->
+    {% with theme_asset_version="20261005-2" %}
+    <script src="{% static 'js/theme.js' %}?v={{ theme_asset_version }}"></script>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v={{ theme_asset_version }}">
+    {% endwith %}
+    <script src="{% static 'js/navbar.js' %}" defer></script>
+    <script src="{% static 'js/forms.js' %}" defer></script>
 
     {% block meta %}
     <title>{{ name }} - Portfolio</title>
@@ -27,7 +34,7 @@
                 {{ name }}
             </a>
 
-            <nav>
+            <nav id="site-nav" aria-label="Navigasi utama">
                 <a href="{% url 'main:show_main' %}">Profile</a>
                 <a href="{% url 'main:show_experience' %}">Experience</a>
                 <a href="{% url 'main:show_skills' %}">Skills</a>
@@ -40,6 +47,15 @@
                 <a href="{% url 'main:register' %}">Register</a>
                 {% endif %}
             </nav>
+            <div class="nav-controls">
+                <button id="theme-toggle" type="button" class="nav-control"
+                        aria-label="Mode gelap" hidden>Mode gelap</button>
+                <button id="nav-toggle" type="button" class="nav-control"
+                        aria-controls="site-nav" aria-expanded="false"
+                        aria-label="Buka navigasi" hidden>
+                    <span aria-hidden="true">&#9776;</span> Menu
+                </button>
+            </div>
 
         </div>
     </header>
