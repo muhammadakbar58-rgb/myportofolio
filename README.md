@@ -41,5 +41,13 @@ AI disclosure : Dalam menerjakan tugas ini,saya menggunakan AI sebagai alat bant
 
 ### Tugas 4
 AI disclosure : Saya menggunakan AI untuk membantu memahami tugas, meninjau ide implementasi Django, dan memperbaiki struktur kode. Seluruh saran yang diberikan AI telah saya tinjau ulang, disesuaikan, dan uji terlebih dahulu sebelum dimasukkan ke dalam program.
-notes : mohon maaf kak asdos saya mengumpulkan link commit yang sama untuk tugas dan tutorial dikarenakan saya lupa commit and push pada saat selesai menerjakan tutorial.
-AI disclosure : Saya menggunakan AI untuk membantu memahami tugas, meninjau ide implementasi Django, dan memperbaiki struktur kode. Seluruh saran yang diberikan AI telah saya tinjau ulang, disesuaikan, dan uji terlebih dahulu sebelum dimasukkan ke dalam program.
+
+### Tugas 5
+
+1. Debouncing adalah teknik untuk menunda eksekusi suatu fungsi sampai pengguna berhenti melakukan input selama kurung waktu tertentu, misalnya 300 ms. Teknik ini penting pada fitur pencarian yang menggunakan AJAX. kalau tidak menggunakan debouncing setiap karakter yang diketik pengguna dapat memicu request baru ke server. Hal ini dapat menyebabkan terlalu banyak request dalam waktu singkat dan membebani server. debouncingmembuat request hanya dikirim setelah pengguna berhenti mengetik dalam kurung waktu yang ditentukan, sehingga pencarian menjadi lebih efisien dan performa aplikasi menjadi lebih baik.
+
+2. Penggunaan await pada fetch() berfungsi untuk menunggu proses asynchronous selesai sebelum program melanjutkan ke baris berikutnya. Hal ini penting karena fetch() mengembalikan sebuah promisew bukan langsung data hasil request. Dengan menggunakan await kita bisa memastikan bahwa response sudah diterima sebelum diproses lebih lanjut, misalnya menggunakan response.json(). Jika await tidak digunakan, variabel yang menyimpan hasil fetch() masih berupa Promise sehingga data belum bisa langsung digunakan. Sebagai alternatif, kita bisa menggunakan .then() untuk menangani Promise tersebut.
+
+3. XSS atau Cross-Site Scripting adalah serangan ketika kode JavaScript berbahaya berhasil dimasukkan ke dalam halaman web dan dijalankan di browser pengguna. Data yang ditampilkan melalui AJAX atau JavaScript bisa lebih rentan terhadap serangan ini karena developer sering melakukan manipulasi DOM secara langsung, misalnya menggunakan innerHTML. Jika data dari pengguna dimasukkan tanpa sanitasi kode HTML atau JavaScript berbahaya bisa ikut dijalankan. Sementara itu, Django template secara default memiliki fitur auto-escaping yang mengubah karakter khusus seperti < dan > menjadi bentuk yang aman. Oleh karena itu, saat menampilkan data melalui JavaScript, lebih aman menggunakan textContent jika datanya hanya berupa teks biasa agar mengurangi risiko XSS.
+
+AI disclosure: AI/Codex saya gunakan untuk membantu analisis struktur project, implementasi JavaScript, serta debugging/refactoring. Kode tetap selalu direview oleh saya sebagai developer sebelum dikumpulkan, hasil pemeriksaan otomatis tidak menggantikan review developer. Saya perlu melengkapi catatan review pribadi setelah benar-benar melakukannya.
