@@ -6,15 +6,15 @@
 {% block content %}
     <main>
         <section class="experience-section" id="projects"
-                 data-projects-url="{% url 'main:get_projects_json' %}"
+                 data-projects-url="{% url 'api:project-list' %}"
                  data-authenticated="{{ user.is_authenticated|yesno:'true,false' }}"
                  data-login-url="{% url 'main:login' %}"
-                 data-star-url="{% url 'main:toggle_star' '00000000-0000-0000-0000-000000000000' %}"
+                 data-star-url="{% url 'api:project-star' '00000000-0000-0000-0000-000000000000' %}"
                  {% if can_edit_projects %}
                  data-edit-url="{% url 'main:update_project' '00000000-0000-0000-0000-000000000000' %}"
                  {% endif %}
                  {% if user.is_superuser %}
-                 data-delete-url="{% url 'main:delete_project' '00000000-0000-0000-0000-000000000000' %}"
+                 data-delete-url="{% url 'api:project-detail' '00000000-0000-0000-0000-000000000000' %}"
                  {% endif %}>
             <div class="container">
                 <p class="section-kicker">Karya yang saya bangun</p>
