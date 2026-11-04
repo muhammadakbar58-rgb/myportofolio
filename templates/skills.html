@@ -5,7 +5,15 @@
 {% endblock meta %}
 {% block content %}
     <main>
-        <section class="experience-section" id="skills">
+        <section class="experience-section" id="skills"
+                 data-list-url="{% url 'api:skill-list' %}"
+                 data-detail-url="{% url 'api:skill-detail' '00000000-0000-0000-0000-000000000000' %}"
+                 data-star-url="{% url 'api:skill-star' '00000000-0000-0000-0000-000000000000' %}"
+                 data-edit-url="{% url 'main:update_skill' '00000000-0000-0000-0000-000000000000' %}"
+                 data-login-url="{% url 'main:login' %}" data-static-url="{% get_static_prefix %}"
+                 data-authenticated="{{ user.is_authenticated|yesno:'true,false' }}"
+                 data-owner="{{ user.is_superuser|yesno:'true,false' }}"
+                 data-editor="{{ can_edit_portfolio|yesno:'true,false' }}">
             <div class="container">
                 <p class="section-kicker">Kemampuan yang saya kembangkan</p>
                 <div class="project-header">
@@ -17,7 +25,15 @@
                     {% endif %}
                 </div>
 
-                <div class="experience-grid">
+                <form id="skill-search-form" class="project-search" hidden>
+                    <input id="skill-search" type="search" class="project-search__input"
+                           placeholder="Cari skill" aria-label="Cari skill">
+                    <button type="submit" class="button">Cari</button>
+                </form>
+                <p id="skills-status" role="status" aria-live="polite"></p>
+                <button id="skills-retry" type="button" class="button button-secondary" hidden>Coba lagi</button>
+                <div id="skills-csrf" hidden>{% csrf_token %}</div>
+                <div id="skill-list" class="experience-grid">
                     {% for skill in skill_list %}
                     <article class="experience-card">
                         <img class="skill-image" src="{% static skill.image %}" alt="{{ skill.name }}" width="64" height="64" loading="lazy">
@@ -35,3 +51,6 @@
         </section>
     </main>
 {% endblock content %}
+{% block scripts %}
+    <script src="{% static 'js/skills.js' %}" defer></script>
+{% endblock scripts %}

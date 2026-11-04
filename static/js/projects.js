@@ -20,6 +20,7 @@
     let cards = [];
     let projectsAbortController;
     let submitting = false;
+    let searchDebounceTimer;
 
     // JSON data must be escaped even when it was saved before form sanitization existed.
     function escapeHtml(value) {
@@ -44,9 +45,8 @@
         return escapeHtml(pattern.replace(placeholderId, encodeURIComponent(id)));
     }
 
-    function buildProjectCardElement(item) {
-        const project = item.fields;
-        const id = escapeHtml(item.pk);
+    function buildProjectCardElement(project) {
+        const id = escapeHtml(project.id);
         const title = escapeHtml(project.title);
         const imageUrl = safeUrl(project.project_image_url);
         const linkUrl = safeUrl(project.project_url);
@@ -56,21 +56,18 @@
         const starContent = `<span aria-hidden="true">&#9733;</span>
             ${project.is_starred ? "Unstar" : "Star"}
             <span class="star-count">${escapeHtml(project.star_count)}</span>`;
-        const csrfInput = `<input type="hidden" name="csrfmiddlewaretoken" value="${escapeHtml(csrfToken)}">`;
         const starHtml = authenticated
-            ? `<form method="post" action="${projectUrl(section.dataset.starUrl, item.pk)}" class="star-form">
-                ${csrfInput}
-                <button type="submit" aria-pressed="${project.is_starred ? "true" : "false"}"
+            ? `<button type="button" data-action="star" data-id="${id}"
+                        aria-pressed="${project.is_starred ? "true" : "false"}"
                         class="button button-star${project.is_starred ? " is-starred" : ""}"
-                        title="${escapeHtml(starTitle)}">${starContent}</button>
-               </form>`
+                        title="${escapeHtml(starTitle)}">${starContent}</button>`
             : `<a href="${escapeHtml(section.dataset.loginUrl + "?next=" + encodeURIComponent(window.location.pathname + window.location.search))}"
                   class="button button-star" title="Login untuk memberi star">${starContent}</a>`;
         const editHtml = section.dataset.editUrl
-            ? `<a href="${projectUrl(section.dataset.editUrl, item.pk)}"
+            ? `<a href="${projectUrl(section.dataset.editUrl, project.id)}"
                   class="button button-secondary project-edit">Edit Proyek</a>`
             : "";
-        // Keep the existing popover confirmation and ordinary CSRF-protected POST.
+        // Keep the existing confirmation popover; its action now uses DRF DELETE.
         const deleteHtml = section.dataset.deleteUrl
             ? `<p class="experience-status">
                 <button type="button" class="button button-danger"
@@ -91,10 +88,8 @@
                     <div class="project-delete-modal__actions">
                         <button type="button" class="button button-secondary"
                                 popovertarget="delete-project-${id}" popovertargetaction="hide">Batal</button>
-                        <form method="post" action="${projectUrl(section.dataset.deleteUrl, item.pk)}">
-                            ${csrfInput}
-                            <button type="submit" class="button button-danger">Ya, Hapus</button>
-                        </form>
+                        <button type="button" class="button button-danger"
+                                data-action="delete" data-id="${id}">Ya, Hapus</button>
                     </div>
                 </div>
                </div>`
@@ -102,7 +97,7 @@
 
         const article = document.createElement("article");
         article.className = "experience-card";
-        article.dataset.projectId = item.pk;
+        article.dataset.projectId = project.id;
         article.innerHTML = `
             ${imageUrl ? `<img src="${escapeHtml(imageUrl)}" alt="Gambar ${title}" class="project-image" loading="lazy">` : ""}
             <h2>${title}</h2>
@@ -156,11 +151,14 @@
         });
 
         const selected = technologyFilter.value;
+        const selectedLabel = technologyFilter.selectedOptions[0]?.textContent;
         const technologies = new Map();
         cards.forEach(card => card.technologies.forEach(label => {
             const key = label.toLowerCase();
             if (!technologies.has(key)) technologies.set(key, label);
         }));
+        // Keep the active filter even when a search has no matching records.
+        if (selected && !technologies.has(selected)) technologies.set(selected, selectedLabel);
         technologyFilter.replaceChildren(new Option("Semua teknologi", ""));
         [...technologies].sort((a, b) => a[1].localeCompare(b[1])).forEach(([key, label]) => {
             technologyFilter.add(new Option(label, key));
@@ -205,8 +203,9 @@
         if (projectsAbortController) projectsAbortController.abort();
         const controller = new AbortController();
         projectsAbortController = controller;
-        // Fetch the complete collection once, then search/filter locally.
         const url = new URL(section.dataset.projectsUrl, window.location.origin);
+        const searchQuery = searchInput.value.trim();
+        if (searchQuery) url.searchParams.set("search", searchQuery);
         status.textContent = "Memuat projects...";
         retry.classList.add("hide");
         grid.setAttribute("aria-busy", "true");
@@ -240,19 +239,69 @@
     searchInput.placeholder = "Cari nama, deskripsi, atau teknologi";
     searchInput.setAttribute("aria-label", "Cari nama, deskripsi, atau teknologi");
     searchInput.setAttribute("aria-controls", "project-list");
-    searchInput.addEventListener("input", applyFilters);
+    searchInput.addEventListener("input", () => {
+        clearTimeout(searchDebounceTimer);
+        // Cancel immediately so a previous response cannot replace a newer search.
+        if (projectsAbortController) projectsAbortController.abort();
+        applyFilters();
+        searchDebounceTimer = setTimeout(fetchProjects, 300);
+    });
     searchForm.addEventListener("submit", event => {
         event.preventDefault();
-        applyFilters();
+        clearTimeout(searchDebounceTimer);
+        fetchProjects();
     });
     technologyFilter.addEventListener("change", applyFilters);
     document.getElementById("projects-reset").addEventListener("click", () => {
         searchInput.value = "";
         technologyFilter.value = "";
-        applyFilters();
+        clearTimeout(searchDebounceTimer);
+        fetchProjects();
         searchInput.focus();
     });
     retry.addEventListener("click", fetchProjects);
+
+    async function writeProject(url, method, payload) {
+        const response = await fetch(url, {
+            method,
+            credentials: "same-origin",
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfToken,
+            },
+            body: payload === undefined ? undefined : JSON.stringify(payload),
+        });
+        if (response.status === 204) return null;
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            const messages = Object.values(data).flat().filter(value => typeof value === "string");
+            throw new Error(messages.join(" ") || "Permintaan gagal (status " + response.status + ").");
+        }
+        if (!data.id) throw new Error("Respons server tidak valid. Muat ulang daftar proyek.");
+        return data;
+    }
+
+    grid.addEventListener("click", async event => {
+        const button = event.target.closest("button[data-action]");
+        if (!button || button.disabled) return;
+        const action = button.dataset.action;
+        if (!["star", "delete"].includes(action)) return;
+        button.disabled = true;
+        try {
+            const pattern = action === "star" ? section.dataset.starUrl : section.dataset.deleteUrl;
+            const url = pattern.replace(placeholderId, encodeURIComponent(button.dataset.id));
+            await writeProject(url, action === "star" ? "POST" : "DELETE");
+            const popover = button.closest("[popover]");
+            if (popover) popover.hidePopover();
+            showToast("Berhasil", action === "star" ? "Star diperbarui." : "Proyek dihapus.", "success");
+            await fetchProjects();
+        } catch (error) {
+            showToast("Permintaan gagal", error.message, "error");
+        } finally {
+            button.disabled = false;
+        }
+    });
 
     if (projectForm) {
         projectForm.addEventListener("submit", async event => {
@@ -268,25 +317,11 @@
             projectForm.setAttribute("aria-busy", "true");
 
             try {
-                const response = await fetch(projectForm.dataset.ajaxUrl, {
-                    method: "POST",
-                    credentials: "same-origin",
-                    headers: {
-                        "Accept": "application/json",
-                        "X-CSRFToken": projectForm.elements.csrfmiddlewaretoken.value,
-                    },
-                    body: new FormData(projectForm),
-                });
-                const result = await response.json().catch(() => ({}));
-                if (!response.ok) {
-                    const errors = result.errors
-                        ? Object.values(result.errors).flat().map(error => error.message)
-                        : [result.message || "Terjadi kesalahan (status " + response.status + "). Muat ulang halaman jika sesi telah berakhir."];
-                    throw new Error(errors.join(" "));
-                }
-                if (response.redirected || !result.pk) {
-                    throw new Error("Respons server tidak valid. Muat ulang halaman dan periksa daftar proyek.");
-                }
+                const fields = new FormData(projectForm);
+                const payload = Object.fromEntries([
+                    "title", "description", "tech_stack", "project_url", "project_image_url",
+                ].map(name => [name, fields.get(name)]));
+                await writeProject(projectForm.dataset.ajaxUrl, "POST", payload);
                 projectForm.reset();
                 document.getElementById("add-project-modal").hidePopover();
                 showToast("Berhasil", "Proyek baru berhasil ditambahkan!", "success");

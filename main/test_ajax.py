@@ -143,7 +143,7 @@ class ProjectAjaxTest(TestCase):
                 self.assertIn("csrftoken", response.cookies)
                 if user == self.owner:
                     self.assertContains(response, 'id="project-form"')
-                    self.assertContains(response, f'data-ajax-url="{self.create_url}"')
+                    self.assertContains(response, f'data-ajax-url="{reverse("api:project-list")}"')
                 else:
                     self.assertNotContains(response, 'id="project-form"')
 

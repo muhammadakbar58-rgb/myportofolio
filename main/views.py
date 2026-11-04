@@ -192,7 +192,7 @@ def register(request):
         return redirect("main:login")
 
     context = {
-        "name": "Burhan",
+        "name": "Muhammad Akbar Rinaldy",
         "form": form,
     }
     return render(request, "register.html", context)
@@ -214,7 +214,7 @@ def login_user(request):
         return response
 
     context = {
-        "name": "Burhan",
+        "name": "Muhammad Akbar Rinaldy",
         "form": form,
     }
     context["next"] = next_url
