@@ -19,7 +19,8 @@
                 <div class="project-header">
                     <h1>Skills</h1>
                     {% if user.is_superuser %}
-                        <a href="{% url 'main:create_skill' %}" class="button project-add-button">
+                        <a id="skill-create" href="{% url 'main:create_skill' %}" class="button project-add-button"
+                           aria-haspopup="dialog" aria-controls="skill-modal">
                             <span aria-hidden="true">+</span> Tambah Skill
                         </a>
                     {% endif %}
@@ -50,6 +51,9 @@
             </div>
         </section>
     </main>
+    {% if can_edit_portfolio %}
+        {% include "components/skill_form_modal.html" %}
+    {% endif %}
 {% endblock content %}
 {% block scripts %}
     <script src="{% static 'js/skills.js' %}" defer></script>

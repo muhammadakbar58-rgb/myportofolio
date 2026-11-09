@@ -3,6 +3,8 @@
 (() => {
     const section = document.getElementById("skills");
     const form = document.getElementById("skill-form");
+    const modal = document.getElementById("skill-modal");
+    const fieldNames = ["name", "description", "image"];
     const token = document.querySelector("#skills-csrf input, #skill-form input[name=csrfmiddlewaretoken]")?.value;
     const placeholder = "00000000-0000-0000-0000-000000000000";
     const endpoint = (pattern, id) => pattern.replace(placeholder, encodeURIComponent(id));
@@ -26,6 +28,51 @@
         return data;
     }
 
+    function resetForm() {
+        form.reset();
+        document.getElementById("skill-form-error").textContent = "";
+        fieldNames.forEach(name => {
+            const field = form.elements.namedItem(name);
+            field.setCustomValidity("");
+            field.removeAttribute("aria-invalid");
+            const feedback = document.getElementById(field.id + "-feedback");
+            if (feedback) feedback.textContent = "";
+        });
+    }
+
+    function openForm(skill = null) {
+        if (!modal || form.getAttribute("aria-busy") === "true") return;
+        resetForm();
+        form.dataset.ajaxUrl = skill
+            ? endpoint(section.dataset.detailUrl, skill.id) : section.dataset.listUrl;
+        form.dataset.apiMethod = skill ? "PATCH" : "POST";
+        const label = skill ? "Edit Skill" : "Tambah Skill";
+        document.getElementById("skill-modal-title").textContent = label;
+        form.querySelector('button[type="submit"]').textContent = skill ? "Simpan Perubahan" : label;
+        fieldNames.forEach(name => {
+            const field = form.elements.namedItem(name);
+            field.value = skill ? skill[name] : "";
+            field.dispatchEvent(new Event("input", { bubbles: true }));
+        });
+        modal.showModal();
+        form.elements.namedItem("name").focus();
+    }
+
+    if (modal) {
+        document.getElementById("skill-create")?.addEventListener("click", event => {
+            event.preventDefault();
+            openForm();
+        });
+        modal.querySelectorAll("[data-skill-close]").forEach(button => {
+            button.addEventListener("click", () => {
+                if (form.getAttribute("aria-busy") !== "true") modal.close();
+            });
+        });
+        modal.addEventListener("cancel", event => {
+            if (form.getAttribute("aria-busy") === "true") event.preventDefault();
+        });
+    }
+
     if (form) {
         form.addEventListener("submit", async event => {
             event.preventDefault();
@@ -37,11 +84,19 @@
             error.textContent = "";
             try {
                 const fields = new FormData(form);
-                const payload = Object.fromEntries(["name", "description", "image"]
-                    .map(name => [name, fields.get(name)]));
+                const payload = Object.fromEntries(fieldNames.map(name => [name, fields.get(name)]));
+                const created = form.dataset.apiMethod === "POST";
                 await writeSkill(form.dataset.ajaxUrl, form.dataset.apiMethod, payload);
-                if (form.dataset.apiMethod === "POST") form.reset();
-                showToast("Berhasil", "Skill tersimpan. Gunakan navigasi Skills untuk melihat daftar.", "success");
+                if (modal) {
+                    modal.close();
+                    // A newly added item should be visible even after a previous search.
+                    if (created) search.value = "";
+                    clearTimeout(timer);
+                    await fetchSkills();
+                } else if (created) {
+                    resetForm();
+                }
+                showToast("Berhasil", created ? "Skill berhasil ditambahkan." : "Skill berhasil diperbarui.", "success");
             } catch (failure) {
                 error.textContent = failure.message;
                 showToast("Gagal menyimpan skill", failure.message, "error");
@@ -60,6 +115,7 @@
     const search = document.getElementById("skill-search");
     let controller;
     let timer;
+    const items = new Map();
     searchForm.hidden = false;
 
     function card(skill) {
@@ -77,7 +133,7 @@
             : `<a class="button button-star" href="${escapeHtml(section.dataset.loginUrl + "?next=" + encodeURIComponent(window.location.pathname + window.location.search))}">
                  <span aria-hidden="true">&#9733;</span> Star <span class="star-count">${escapeHtml(skill.star_count)}</span></a>`;
         const edit = section.dataset.editor === "true"
-            ? `<a class="button button-secondary" href="${escapeHtml(endpoint(section.dataset.editUrl, skill.id))}">Edit Skill</a>` : "";
+            ? `<a class="button button-secondary" data-action="edit" data-id="${id}" aria-haspopup="dialog" aria-controls="skill-modal" href="${escapeHtml(endpoint(section.dataset.editUrl, skill.id))}">Edit Skill</a>` : "";
         const remove = section.dataset.owner === "true"
             ? `<p class="experience-status"><button type="button" class="button button-danger"
                  popovertarget="delete-skill-${id}" aria-label="Hapus ${name}">Hapus Skill</button></p>
@@ -121,21 +177,32 @@
             const skills = await response.json();
             if (!Array.isArray(skills)) throw new Error("Format data skill tidak valid.");
             if (current.signal.aborted) return;
-            grid.replaceChildren(...skills.map(card));
-            status.textContent = skills.length ? "" : "Tidak ada skill yang cocok.";
+            const cards = skills.map(card);
+            items.clear();
+            skills.forEach(skill => items.set(String(skill.id), skill));
+            grid.replaceChildren(...cards);
+            status.textContent = skills.length ? "" : search.value.trim()
+                ? "Tidak ada skill yang cocok." : "Belum ada skill yang ditambahkan.";
         } catch (failure) {
             if (current.signal.aborted) return;
             status.textContent = failure.message;
             retry.hidden = false;
+            showToast("Gagal memuat skills", failure.message, "error");
         } finally {
             if (controller === current) grid.setAttribute("aria-busy", "false");
         }
     }
 
     grid.addEventListener("click", async event => {
-        const button = event.target.closest("button[data-action]");
+        const button = event.target.closest("[data-action]");
         if (!button || button.disabled) return;
         const action = button.dataset.action;
+        if (action === "edit" && modal) {
+            event.preventDefault();
+            const skill = items.get(button.dataset.id);
+            if (skill) openForm(skill);
+            return;
+        }
         if (!["star", "delete"].includes(action)) return;
         button.disabled = true;
         try {

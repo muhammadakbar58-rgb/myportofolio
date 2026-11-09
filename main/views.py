@@ -38,11 +38,13 @@ def show_experience(request):
     return render(request, "experience.html", context)
 
 
+@ensure_csrf_cookie
 def show_skills(request):
     context = {
         "name": "Muhammad Akbar Rinaldy",
         "skill_list": _with_star_status(Skill.objects.all(), request.user),
         "can_edit_portfolio": _can_edit_portfolio(request.user),
+        "skill_form": SkillForm(),
     }
     return render(request, "skills.html", context)
 

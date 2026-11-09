@@ -2,6 +2,7 @@ from django.utils.html import strip_tags
 from rest_framework import serializers
 
 from main.models import Project, Skill
+from main.validators import clean_skill_text
 
 
 class StarredItemSerializer(serializers.ModelSerializer):
@@ -55,13 +56,10 @@ class SkillSerializer(StarredItemSerializer):
         read_only_fields = ["id"]
 
     def validate_name(self, value):
-        value = strip_tags(value).strip()
-        if not value:
-            raise serializers.ValidationError("Name cannot be empty.")
-        return value
+        return clean_skill_text(value)
 
     def validate_description(self, value):
-        value = strip_tags(value).strip()
-        if not value:
-            raise serializers.ValidationError("Description cannot be empty.")
-        return value
+        return clean_skill_text(value)
+
+    def validate_image(self, value):
+        return clean_skill_text(value)
