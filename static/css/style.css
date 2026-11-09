@@ -764,7 +764,8 @@ html {
     justify-content: center;
 }
 
-.project-form-modal:popover-open {
+.project-form-modal:popover-open,
+.project-form-modal[open] {
     display: flex;
 }
 

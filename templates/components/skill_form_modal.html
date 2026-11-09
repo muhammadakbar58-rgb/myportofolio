@@ -1,0 +1,28 @@
+<dialog id="skill-modal" class="project-form-modal" aria-labelledby="skill-modal-title">
+    <button type="button" class="project-form-modal__backdrop" data-skill-close
+            aria-label="Tutup form skill"></button>
+    <div class="project-form-modal__content">
+        <button type="button" class="project-form-modal__close" data-skill-close
+                aria-label="Tutup form skill">&times;</button>
+        <h2 id="skill-modal-title">Tambah Skill</h2>
+        <form id="skill-form" method="post" action="{% url 'main:show_skills' %}"
+              data-ajax-url="{% url 'api:skill-list' %}" data-api-method="POST"
+              class="project-form" data-enhance-form>
+            {% csrf_token %}
+            <p id="skill-form-error" class="form-error" role="alert"></p>
+            {% for field in skill_form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <p id="{{ field.auto_id }}_helptext">{{ field.help_text }}</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <div class="project-form-modal__actions">
+                <button type="button" class="button button-secondary" data-skill-close>Batal</button>
+                <button type="submit" class="button">Tambah Skill</button>
+            </div>
+        </form>
+    </div>
+</dialog>

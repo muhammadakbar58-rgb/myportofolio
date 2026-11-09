@@ -3,6 +3,7 @@ from django.utils.html import strip_tags
 from django.forms import DateTimeInput, ModelForm, TextInput, Textarea, URLInput
 
 from main.models import Experience, Project, Skill
+from main.validators import clean_skill_text
 
 class ProjectForm(ModelForm):
     class Meta:
@@ -110,3 +111,12 @@ class SkillForm(ModelForm):
             "description": Textarea(attrs={"rows": 3}),
             "image": TextInput(attrs={"placeholder": "img/python.png"}),
         }
+
+    def clean_name(self):
+        return clean_skill_text(self.cleaned_data["name"])
+
+    def clean_description(self):
+        return clean_skill_text(self.cleaned_data["description"])
+
+    def clean_image(self):
+        return clean_skill_text(self.cleaned_data["image"])

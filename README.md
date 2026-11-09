@@ -1,3 +1,4 @@
+
 Nama : Muhammad Akbar Rinaldy
 NPM  : 2506586311
 PBP  : E
@@ -51,3 +52,17 @@ AI disclosure : Saya menggunakan AI untuk membantu memahami tugas, meninjau ide 
 3. XSS atau Cross-Site Scripting adalah serangan ketika kode JavaScript berbahaya berhasil dimasukkan ke dalam halaman web dan dijalankan di browser pengguna. Data yang ditampilkan melalui AJAX atau JavaScript bisa lebih rentan terhadap serangan ini karena developer sering melakukan manipulasi DOM secara langsung, misalnya menggunakan innerHTML. Jika data dari pengguna dimasukkan tanpa sanitasi kode HTML atau JavaScript berbahaya bisa ikut dijalankan. Sementara itu, Django template secara default memiliki fitur auto-escaping yang mengubah karakter khusus seperti < dan > menjadi bentuk yang aman. Oleh karena itu, saat menampilkan data melalui JavaScript, lebih aman menggunakan textContent jika datanya hanya berupa teks biasa agar mengurangi risiko XSS.
 
 AI disclosure: AI/Codex saya gunakan untuk membantu analisis struktur project, implementasi JavaScript, serta debugging/refactoring. Kode tetap selalu direview oleh saya sebagai developer sebelum dikumpulkan, hasil pemeriksaan otomatis tidak menggantikan review developer. Saya perlu melengkapi catatan review pribadi setelah benar-benar melakukannya.
+
+
+### Tugas 6
+
+1. REST adalah gaya arsitektur yang mengatur komunikasi client dan server melalui resource dan method HTTP. REST memiliki prinsip seperti stateless, client-server, dan cacheability. API yang menghasilkan JSON belum tentu RESTful, karena penggunaan method HTTP juga harus sesuai fungsinya. PUT digunakan untuk mengganti seluruh data resource, sedangkan PATCH hanya mengubah bagian tertentu. PUT bersifat idempotent, sementara PATCH bergantung pada operasinya. API tugas ini sudah mengikuti pola REST, tetapi masih menggunakan session authentication sehingga belum sepenuhnya stateless.
+
+2. Serializer digunakan untuk mengubah data model menjadi JSON dan memvalidasi data yang masuk sebelum disimpan. ModelSerializer mempermudah proses ini karena dapat menggunakan aturan dari model secara langsung. Pada SkillSerializr, field ditentukan secara eksplisit, teks divalidasi, dan informasi star dihitung otomatis. Dibandingkan menggunakan JsonResponse manual, serializer membuat kode lebih rapi, validasi lebih konsisten, dan mengurangi risiko data sensitif ikut ditampilkan.
+
+3. Autentikasi memastikan identitas pengguna, otorisasi menentukan apa yang boleh dilakukan pengguna tersebut. Dalam tugas ini semua orang bisa melihat data, editor dan superuser dapat mengedit, tapi hanya superuser yang boleh membuat atau menghapus data. Fitur star hanya tersedia untuk pengguna yang sudah login. Pembatasan ini harus diterapkan di server, bukan hanya dengan menyembunyikan tombol, karena pengguna tetap bisa mengirim request secara langsung.
+
+4. CSRF digunakan untuk mencegah pihak lain melakukan perubahan data menggunakan sesi login pengguna tanpa izin. Karena API ini menggunakan session authentication, request seperti POST, PUT, PATCH, dan DELETE perlu menyertakan token CSRF. Token dikirim melalui header X-CSRFToken. Untuk mengujinya, digunakan apiClient dengan enforce_csrf_checks=True. Test memastikan request tanpa token ditolak dengan status 403 dan data tidak berubah, sedangkan request dengan token yang valid berhasil. force_authenticate tidak cukup untuk menguji CSRF karena melewati autentikasi normal.
+
+AI disclosure: Saya menggunakan Codex sebagai alat bantu dalam mengerjakan Tugas 6, mulai dari memeriksa checklist dan meninjau kode yang sudah ada hingga melengkapi modal tambah/edit serta validasi pada bagian Skills. Codex juga membantu menyusun test untuk memeriksa hak akses pengguna, fitur star, dan perlindungan CSRF, serta membantu penyusunan dokumentasi dan draf jawaban reflektif. Kode dan penjelasan yang dihasilkan AI tetap saya tinjau, uji, dan pahami kembali sebelum dikumpulkan.
+
